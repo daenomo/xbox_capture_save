@@ -41,7 +41,7 @@ find "${onedirvedir}" -name "*.mp4" -print0 | xargs -0 -I {} sh -c '
     -segment_format_options movflags=+faststart \
     -reset_timestamps 1 \
     -segment_time 137 \
-    "'"${forxdir}${name}_%02d.mp4"'"
+    "'"${forxdir}"'${name}_%02d.mp4"
 '
 
 # スクリーンショットを移動
