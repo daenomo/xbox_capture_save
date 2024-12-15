@@ -38,3 +38,6 @@ mv "${windowshomedir}OneDrive/Pictures/Xbox Screenshots/"*.* ${windowshomedir}Vi
 # 古いファイルを削除
 find ${windowshomedir}Videos/xbox/ -mtime +3 -type f -exec rm {} \;
 ```
+# 参考にしたサイト
+* [ffmpegでフォルダ内の動画を一括変換する \#Mac \- Qiita](https://qiita.com/hosota9/items/29f845854db2e4eeebc0)
+* [とほほのBash入門 \- とほほのWWW入門](https://www.tohoho-web.com/ex/shell.html#shell-script)
