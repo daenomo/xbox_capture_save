@@ -43,8 +43,11 @@ find "${onedirvedir}" -name "*.mp4" -print0 | xargs -0 -I {} sh -c '
     -segment_time 137 \
     "'"${forxdir}${name}_%02d.mp4"'"
 '
+
 # スクリーンショットを移動
-mv "${windowshomedir}OneDrive/Pictures/Xbox Screenshots/"*.* ${windowshomedir}Videos/xbox/
+find "${windowshomedir}OneDrive/Pictures/Xbox Screenshots/" -name "*.*" -print0 | xargs -0 -I {} \
+  mv "{}" ${windowshomedir}Videos/xbox/
+
 # 古いファイルを削除
 find ${windowshomedir}Videos/xbox/ -mtime +3 -type f -exec rm {} \;
 ```
