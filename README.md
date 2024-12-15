@@ -1,4 +1,11 @@
 # xbox_capture_save
+* Xboxではキャプチャした動画や静止画をOneDriveに保存できる
+* しかしOneDriveは5GBしかないのですぐに溜まって消すのが面倒
+* WindowsではOneDriveと同期する設定がありWindows側の通常のファイル操作でOneDriveからファイルをコピーしたり消すことができる
+* そこで同期したOneDriveからWindows側の通常のディレクトリに移動することでOneDriveのファイルを消す
+* さらにXにアップロードしたいのでついでに自動で140秒未満のファイルに分割する
+
+## 概要
 * One Driveに転送されたXboxの動画ファイルを別のディレクトリに移動する
   * 移動した動画ファイルをX向けに分割する
 * One Driveに転送されたXboxの静止画ファイルを別のディレクトリに移動する
@@ -29,7 +36,7 @@ do
     -flags +global_header \
     -segment_format_options movflags=+faststart \
     -reset_timestamps 1 \
-    -segment_time 137 \
+    -segment_time 137 \ # 140秒ギリギリだと超えることがあるので若干短めにした
     "${forxdir}${name}_%02d.mp4"
 done
 
