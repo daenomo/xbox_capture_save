@@ -26,22 +26,23 @@ windowshomedir="/mnt/c/Users/name/"
 onedirvedir="${windowshomedir}OneDrive/動画/Xbox Game DVR/"
 workdir="${windowshomedir}Videos/xbox/"
 forxdir="${workdir}/tmp/"
-for src in "${onedirvedir}"*.mp4 # ディレクトリ名にスペースが入ってるため " でくくる
-do 
-  namewithext=${src#${onedirvedir}}
+
+find "${onedirvedir}" -name "*.mp4" -print0 | xargs -0 -I {} sh -c '
+  src="{}"
+  namewithext="${src#"'"${onedirvedir}"'"}"
+  echo $namewithext
   name=${namewithext%.mp4}
-  mv "${src}" $workdir
+  mv "$src" "'"${workdir}"'"
   ffmpeg \
-    -i "${workdir}${namewithext}" \
+    -i "'"${workdir}"'${namewithext}" \
     -c copy \
     -f segment \
     -flags +global_header \
     -segment_format_options movflags=+faststart \
     -reset_timestamps 1 \
-    -segment_time 137 \ # 140秒ギリギリだと超えることがあるので若干短めにした
-    "${forxdir}${name}_%02d.mp4"
-done
-
+    -segment_time 137 \
+    "'"${forxdir}${name}_%02d.mp4"'"
+'
 # スクリーンショットを移動
 mv "${windowshomedir}OneDrive/Pictures/Xbox Screenshots/"*.* ${windowshomedir}Videos/xbox/
 # 古いファイルを削除
