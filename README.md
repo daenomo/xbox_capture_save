@@ -21,35 +21,53 @@
 ```
 #!/usr/bin/bash
 
-# 動画ファイルの移動とファイル分割
-windowshomedir="/mnt/c/Users/name/"
+windowshomedir="${HOME}/"
 onedirvedir="${windowshomedir}OneDrive/動画/Xbox Game DVR/"
-workdir="${windowshomedir}Videos/xbox/"
-forxdir="${workdir}/tmp/"
 
-find "${onedirvedir}" -name "*.mp4" -print0 | xargs -0 -I {} sh -c '
-  src="{}"
-  namewithext="${src#"'"${onedirvedir}"'"}"
-  echo $namewithext
+encode() {
+  src=$1
+  onedirvedir=$2
+  workdir="${windowshomedir}Videos/xbox/"
+  forxdir="${workdir}/tmp/"
+  forbsdir="${workdir}/tmp/"
+  ffmpegcmd="ffmpeg.exe"
+  namewithext="${src#"${onedirvedir}"}"
   name=${namewithext%.mp4}
-  mv "$src" "'"${workdir}"'"
-  ffmpeg \
-    -i "'"${workdir}"'${namewithext}" \
-    -c copy \
+  # OneDriveの動機が遅いとmvに失敗するためエラー出力抑制と脱出
+  mv "$src" "${workdir}" 2> /dev/null
+  if [ ! -e "${workdir}${namewithext}" ]; then
+    exit 0
+  fi
+
+  touch "${workdir}${namewithext}"
+
+  # Bluesky用
+  ${ffmpegcmd} \
+    -i "${workdir}${namewithext}" \
+    -vf "scale=-1:720" -c:v h264_amf -c:a copy -b 7000k \
     -f segment \
     -flags +global_header \
     -segment_format_options movflags=+faststart \
     -reset_timestamps 1 \
-    -segment_time 137 \
-    "'"${forxdir}"'${name}_%02d.mp4"
-'
+    -segment_time 55 \
+    "${forbsdir}${name}_bs_%02d.mp4"
 
-# スクリーンショットを移動
-find "${windowshomedir}OneDrive/Pictures/Xbox Screenshots/" -name "*.*" -print0 | xargs -0 -I {} \
-  mv "{}" ${windowshomedir}Videos/xbox/
+  mv "${workdir}${namewithext}" "${forxdir}"
+}
+export -f encode
 
-# 古いファイルを削除
-find ${windowshomedir}Videos/xbox/ -mtime +3 -type f -exec rm {} \;
+while true; do
+
+  find "${onedirvedir}" -name "*.mp4" -print0 | xargs -0 -I {} sh -c 'encode "$1" "$2"' _ {} "${onedirvedir}"
+
+  # スクリーンショットを移動
+  find "${windowshomedir}OneDrive/Pictures/Xbox Screenshots/" -name "*.*" -print0 | xargs -0 -I {} \
+    mv "{}" ${windowshomedir}Videos/xbox/ 2> /dev/null
+
+  # 古いファイルを削除
+  find ${windowshomedir}Videos/xbox/ -mtime +2 -type f -exec rm {} \;
+
+sleep 1s; done
 ```
 ## 参考にしたサイト
 * [ffmpegでフォルダ内の動画を一括変換する \#Mac \- Qiita](https://qiita.com/hosota9/items/29f845854db2e4eeebc0)
