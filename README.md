@@ -15,7 +15,7 @@
 ## 事前準備
 * Windows上のGit Bashで動作するが書き換えればWSLなどでも動くと思う
 * ハードウエアエンコードを利かす為にWindows用のffmpegをインストールする
-* 必要ならwindowshomedirのnameを書き換える
+* 必要ならwindowshomedirを書き換える
 * workdirを作成する
   
 ```
