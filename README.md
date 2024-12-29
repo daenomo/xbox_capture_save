@@ -7,6 +7,13 @@
 * この操作にはおそらくWindowsだけで完結できるが、慣れているためGit Bashを前提とした
 
 ## 概要
+```mermaid
+sequenceDiagram
+    Xbox ->> OneDrive : 動画ファイル
+    OneDrive ->> OneDriveDir : ファイル同期
+    xbox_capture_save ->> OneDriveDir : 動画ファイル取得
+    xbox_capture_save ->> xbox_capture_save : 分割、エンコード
+```
 * One Driveに転送されたXboxの動画ファイルを別のディレクトリに移動する
   * 移動した動画ファイルをBluesky向けに分割する
 * One Driveに転送されたXboxの静止画ファイルを別のディレクトリに移動する
