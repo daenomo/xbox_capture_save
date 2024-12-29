@@ -10,9 +10,11 @@
 ```mermaid
 sequenceDiagram
     Xbox ->> OneDrive : 動画ファイル
-    OneDrive ->> OneDriveDir : ファイル同期
-    xbox_capture_save ->> OneDriveDir : 動画ファイル取得
+    OneDrive <<->> OneDriveDir : ファイル同期
+    xbox_capture_save <<->> OneDriveDir : 動画ファイル移動
     xbox_capture_save ->> xbox_capture_save : 分割、エンコード
+    xbox_capture_save <<->> OneDriveDir : 静止画ファイル移動
+    xbox_capture_save ->> xbox_capture_save : 古いファイルを削除
 ```
 * One Driveに転送されたXboxの動画ファイルを別のディレクトリに移動する
   * 移動した動画ファイルをBluesky向けに分割する
