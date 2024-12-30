@@ -65,11 +65,12 @@ encode() {
 
   mv "${workdir}${namewithext}" "${forxdir}"
 }
-export -f encode
 
 while true; do
 
-  find "${onedirvedir}" -name "*.mp4" -print0 | xargs -0 -I {} sh -c 'encode "$1" "$2"' _ {} "${onedirvedir}"
+  find "${onedirvedir}" -name "*.mp4" -print0 | while IFS= read -r -d '' file; do
+    encode "${file}" "${onedirvedir}"
+  done
 
   # スクリーンショットを移動
   find "${windowshomedir}OneDrive/Pictures/Xbox Screenshots/" -name "*.*" -print0 | xargs -0 -I {} \
