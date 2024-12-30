@@ -41,10 +41,12 @@ ffmpegcmd="ffmpeg.exe"
 
 while true; do
 
+  # 動画を移動してエンコードする
   find "${onedirvedir}" -name "*.mp4" -print0 | while IFS= read -r -d '' file; do
     namewithext="${file#"${onedirvedir}"}"
     name=${namewithext%.mp4}
-    # OneDriveの動機が遅いとmvに失敗するためエラー出力抑制と脱出
+
+    # OneDriveの動機が遅いとmvに失敗するためエラー出力抑制
     mv "$file" "${workdir}" 2> /dev/null
     if [ ! -e "${workdir}${namewithext}" ]; then
       exit 0
@@ -61,6 +63,7 @@ while true; do
       -segment_time 55 \
       "${forbsdir}${name}_bs_%02d.mp4"
 
+    # 元の動画も残しておく
     mv "${workdir}${namewithext}" "${forxdir}"
 
   done
