@@ -34,51 +34,44 @@ sequenceDiagram
 
 windowshomedir="${HOME}/"
 onedirvedir="${windowshomedir}OneDrive/動画/Xbox Game DVR/"
-
-encode() {
-  src=$1
-  onedirvedir=$2
-  workdir="${windowshomedir}Videos/xbox/"
-  forxdir="${workdir}/tmp/"
-  forbsdir="${workdir}/tmp/"
-  ffmpegcmd="ffmpeg.exe"
-  namewithext="${src#"${onedirvedir}"}"
-  name=${namewithext%.mp4}
-  # OneDriveの動機が遅いとmvに失敗するためエラー出力抑制と脱出
-  mv "$src" "${workdir}" 2> /dev/null
-  if [ ! -e "${workdir}${namewithext}" ]; then
-    exit 0
-  fi
-
-  touch "${workdir}${namewithext}"
-
-  # Bluesky用
-  ${ffmpegcmd} \
-    -i "${workdir}${namewithext}" \
-    -vf "scale=-1:720" -c:v h264_amf -c:a copy -b 7000k \
-    -f segment \
-    -flags +global_header \
-    -segment_format_options movflags=+faststart \
-    -reset_timestamps 1 \
-    -segment_time 55 \
-    "${forbsdir}${name}_bs_%02d.mp4"
-
-  mv "${workdir}${namewithext}" "${forxdir}"
-}
+workdir="${windowshomedir}Videos/xbox/"
+forxdir="${workdir}/tmp/"
+forbsdir="${workdir}/tmp/"
+ffmpegcmd="ffmpeg.exe"
 
 while true; do
 
   find "${onedirvedir}" -name "*.mp4" -print0 | while IFS= read -r -d '' file; do
-    encode "${file}" "${onedirvedir}"
+    namewithext="${file#"${onedirvedir}"}"
+    name=${namewithext%.mp4}
+    # OneDriveの動機が遅いとmvに失敗するためエラー出力抑制と脱出
+    mv "$file" "${workdir}" 2> /dev/null
+    if [ ! -e "${workdir}${namewithext}" ]; then
+      exit 0
+    fi
+
+    # Bluesky用
+    ${ffmpegcmd} \
+      -i "${workdir}${namewithext}" \
+      -vf "scale=-1:720" -c:v h264_amf -c:a copy -b 7000k \
+      -f segment \
+      -flags +global_header \
+      -segment_format_options movflags=+faststart \
+      -reset_timestamps 1 \
+      -segment_time 55 \
+      "${forbsdir}${name}_bs_%02d.mp4"
+
+    mv "${workdir}${namewithext}" "${forxdir}"
+
   done
 
   # スクリーンショットを移動
   find "${windowshomedir}OneDrive/Pictures/Xbox Screenshots/" -name "*.*" -print0 | while IFS= read -r -d '' file; do
-    mv "$file" "${windowshomedir}Videos/xbox/" 2> /dev/null
+    mv "$file" "${workdir}" 2> /dev/null
   done
 
   # 古いファイルを削除
-  find "${windowshomedir}Videos/xbox/" -mtime +2 -type f -print0 | while IFS= read -r -d '' file; do
+  find "${workdir}" -mtime +2 -type f -print0 | while IFS= read -r -d '' file; do
     rm "$file"
   done
 
