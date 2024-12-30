@@ -73,11 +73,14 @@ while true; do
   done
 
   # スクリーンショットを移動
-  find "${windowshomedir}OneDrive/Pictures/Xbox Screenshots/" -name "*.*" -print0 | xargs -0 -I {} \
-    mv "{}" ${windowshomedir}Videos/xbox/ 2> /dev/null
+  find "${windowshomedir}OneDrive/Pictures/Xbox Screenshots/" -name "*.*" -print0 | while IFS= read -r -d '' file; do
+    mv "$file" "${windowshomedir}Videos/xbox/" 2> /dev/null
+  done
 
   # 古いファイルを削除
-  find ${windowshomedir}Videos/xbox/ -mtime +2 -type f -exec rm {} \;
+  find "${windowshomedir}Videos/xbox/" -mtime +2 -type f -print0 | while IFS= read -r -d '' file; do
+    rm "$file"
+  done
 
 sleep 1s; done
 ```
