@@ -28,58 +28,8 @@ sequenceDiagram
 * ハードウエアエンコードを利かす為にWindows用のffmpegをインストールする
 * 必要ならwindowshomedirを書き換える
 * workdirを作成する
+* https://github.com/daenomo/xbox_capture_save/blob/main/xbox_capture_save.sh を実行する
   
-```
-#!/usr/bin/bash
-
-windowshomedir="${HOME}/"
-onedirvedir="${windowshomedir}OneDrive/動画/Xbox Game DVR/"
-workdir="${windowshomedir}Videos/xbox/"
-forxdir="${workdir}/tmp/"
-forbsdir="${workdir}/tmp/"
-ffmpegcmd="ffmpeg.exe"
-
-while true; do
-
-  # 動画を移動してエンコードする
-  find "${onedirvedir}" -name "*.mp4" -print0 | while IFS= read -r -d '' file; do
-    namewithext="${file#"${onedirvedir}"}"
-    name=${namewithext%.mp4}
-
-    # OneDriveの動機が遅いとmvに失敗するためエラー出力抑制
-    mv "$file" "${workdir}" 2> /dev/null
-    if [ ! -e "${workdir}${namewithext}" ]; then
-      exit 0
-    fi
-
-    # Bluesky用
-    ${ffmpegcmd} \
-      -i "${workdir}${namewithext}" \
-      -vf "scale=-1:720" -c:v h264_amf -c:a copy -b 7000k \
-      -f segment \
-      -flags +global_header \
-      -segment_format_options movflags=+faststart \
-      -reset_timestamps 1 \
-      -segment_time 55 \
-      "${forbsdir}${name}_bs_%02d.mp4"
-
-    # 元の動画も残しておく
-    mv "${workdir}${namewithext}" "${forxdir}"
-
-  done
-
-  # スクリーンショットを移動
-  find "${windowshomedir}OneDrive/Pictures/Xbox Screenshots/" -name "*.*" -print0 | while IFS= read -r -d '' file; do
-    mv "$file" "${workdir}" 2> /dev/null
-  done
-
-  # 古いファイルを削除
-  find "${workdir}" -mtime +2 -type f -print0 | while IFS= read -r -d '' file; do
-    rm "$file"
-  done
-
-sleep 1s; done
-```
 ## 参考にしたサイト
 * [ffmpegでフォルダ内の動画を一括変換する \#Mac \- Qiita](https://qiita.com/hosota9/items/29f845854db2e4eeebc0)
 * [ffmpeg:指定時間毎にファイルを自動分割 \[Design Workshop\]](https://ws.tetsuakibaba.jp/doku.php?id=ffmpeg:%E6%8C%87%E5%AE%9A%E6%99%82%E9%96%93%E6%AF%8E%E3%81%AB%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%82%92%E8%87%AA%E5%8B%95%E5%88%86%E5%89%B2)
