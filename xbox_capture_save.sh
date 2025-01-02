@@ -23,7 +23,7 @@ while true; do
     # Bluesky用
     ${ffmpegcmd} \
       -i "${workdir}${namewithext}" \
-      -vf "scale=-1:720" -c:v h264_amf -c:a copy -b 7000k \
+      -vf "scale=-1:720" -c:v h264_amf -maxrate 7000k -c:a copy -b 7000k \
       -f segment \
       -flags +global_header \
       -segment_format_options movflags=+faststart \
