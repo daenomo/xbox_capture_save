@@ -22,6 +22,7 @@ while true; do sleep 1s
 
     # Bluesky用
     ${ffmpegcmd} \
+      -nostdin \
       -i "${workdir}${namewithext}" \
       -vf "scale=-1:720" -c:v h264_amf -maxrate 7000k -c:a copy -b 7000k \
       -f segment \
