@@ -10,7 +10,7 @@ ffmpegcmd="ffmpeg.exe"
 while true; do sleep 1s
 
   # 動画を移動してエンコードする
-  while IFS= read -r -d '' -u ${FD} file; do
+  find "${onedirvedir}" -name "*.mp4" -print0 | while IFS= read -r -d '' file; do
     namewithext="${file#"${onedirvedir}"}"
     name=${namewithext%.mp4}
 
@@ -35,16 +35,16 @@ while true; do sleep 1s
     # 元の動画も残しておく
     mv "${workdir}${namewithext}" "${forxdir}"
 
-  done {FD}< <(find "${onedirvedir}" -name "*.mp4" -print0)
+  done
 
   # スクリーンショットを移動
-  while IFS= read -r -d '' -u ${FD} file; do
+  find "${windowshomedir}OneDrive/Pictures/Xbox Screenshots/" -name "*.*" -print0 | while IFS= read -r -d '' file; do
     mv "$file" "${workdir}" 2> /dev/null
-  done {FD}< <(find "${windowshomedir}OneDrive/Pictures/Xbox Screenshots/" -name "*.*" -print0)
+  done
 
   # 古いファイルを削除
-  while IFS= read -r -d '' -u ${FD} file; do
+  find "${workdir}" -mtime +2 -type f -print0 | while IFS= read -r -d '' file; do
     rm "$file"
-  done {FD}< <(find "${workdir}" -mtime +2 -type f -print0)
+  done
 
 done
