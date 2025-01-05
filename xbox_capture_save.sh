@@ -5,7 +5,7 @@ onedirvedir="${windowshomedir}OneDrive/動画/Xbox Game DVR/"
 workdir="${windowshomedir}Videos/xbox/"
 forxdir="${workdir}/tmp/"
 forbsdir="${workdir}/tmp/"
-ffmpegcmd="ffmpeg.exe"
+ffmpegcmd="ffmpeg"
 
 while true; do sleep 1s
 
