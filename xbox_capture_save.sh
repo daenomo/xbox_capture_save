@@ -43,8 +43,6 @@ while true; do sleep 1s
   done
 
   # 古いファイルを削除
-  find "${workdir}" -mtime +2 -type f -print0 | while IFS= read -r -d '' file; do
-    rm "$file"
-  done
+  find "${workdir}" -mtime +2 -type f -delete
 
 done
