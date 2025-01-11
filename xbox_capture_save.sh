@@ -7,7 +7,7 @@ forxdir="${workdir}/tmp/"
 forbsdir="${workdir}/tmp/"
 ffmpegcmd="ffmpeg"
 
-while true; do sleep 1s
+while true; do sleep 5s
 
   # 動画を移動してエンコードする
   find "${onedirvedir}" -name "*.mp4" -print0 | while IFS= read -r -d '' file; do
