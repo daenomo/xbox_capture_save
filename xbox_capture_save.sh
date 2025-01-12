@@ -1,48 +1,36 @@
-#!/usr/bin/bash
+#!/bin/bash
 
-windowshomedir="${HOME}/"
-onedirvedir="${windowshomedir}OneDrive/動画/Xbox Game DVR/"
-workdir="${windowshomedir}Videos/xbox/"
-forxdir="${workdir}/tmp/"
-forbsdir="${workdir}/tmp/"
-ffmpegcmd="ffmpeg"
+home="$HOME"
+onedrive="$home/OneDrive/動画/Xbox Game DVR"
+workdir="$home/Videos/xbox"
+tmpdir="$workdir/tmp"
+ffmpeg="ffmpeg"
 
-while true; do sleep 5s
+while true; do
+    sleep 5
 
-  # 動画を移動してエンコードする
-  find "${onedirvedir}" -name "*.mp4" -print0 | while IFS= read -r -d '' file; do
-    namewithext="${file#"${onedirvedir}"}"
-    name=${namewithext%.mp4}
+    for file in "$onedrive"/*.mp4; do
+        [ -e "$file" ] || continue
+        name="${file##*/}"
+        base="${name%.mp4}"
+        
+        # OneDriveの同期が遅いとmvに失敗するためエラー出力抑制
+        mv "$file" "$workdir" 2> /dev/null
+        if [ ! -e "$workdir/$name" ]; then
+            continue
+        fi
+        
+        $ffmpeg -nostdin -i "$workdir/$name" -vf scale=-1:720 -c:v h264_amf -maxrate 7000k \
+                -c:a copy -b:v 7000k -f segment -flags +global_header \
+                -segment_format_options movflags=+faststart -reset_timestamps 1 \
+                -segment_time 55 "$tmpdir/${base}_bs_%02d.mp4"
+        mv "$workdir/$name" "$tmpdir"
+    done
 
-    # OneDriveの動機が遅いとmvに失敗するためエラー出力抑制
-    mv "$file" "${workdir}" 2> /dev/null
-    if [ ! -e "${workdir}${namewithext}" ]; then
-      continue
-    fi
+    for file in "$home/OneDrive/Pictures/Xbox Screenshots"/*.*; do
+        [ -e "$file" ] || continue
+        mv "$file" "$workdir"
+    done
 
-    # Bluesky用
-    ${ffmpegcmd} \
-      -nostdin \
-      -i "${workdir}${namewithext}" \
-      -vf "scale=-1:720" -c:v h264_amf -maxrate 7000k -c:a copy -b 7000k \
-      -f segment \
-      -flags +global_header \
-      -segment_format_options movflags=+faststart \
-      -reset_timestamps 1 \
-      -segment_time 55 \
-      "${forbsdir}${name}_bs_%02d.mp4"
-    
-    # 元の動画も残しておく
-    mv "${workdir}${namewithext}" "${forxdir}"
-
-  done
-
-  # スクリーンショットを移動
-  find "${windowshomedir}OneDrive/Pictures/Xbox Screenshots/" -name "*.*" -print0 | while IFS= read -r -d '' file; do
-    mv "$file" "${workdir}" 2> /dev/null
-  done
-
-  # 古いファイルを削除
-  find "${workdir}" -mtime +2 -type f -delete
-
+    find "$workdir" -type f -mtime +2 -delete
 done
