@@ -4,6 +4,7 @@ home="$HOME"
 onedrive="$home/OneDrive/動画/Xbox Game DVR"
 workdir="$home/Videos/xbox"
 tmpdir="$workdir/tmp"
+videodir="$home/Videos/games"
 ffmpeg="ffmpeg"
 
 while true; do
@@ -24,7 +25,7 @@ while true; do
                 -c:a copy -b:v 7000k -f segment -flags +global_header \
                 -segment_format_options movflags=+faststart -reset_timestamps 1 \
                 -segment_time 55 "$tmpdir/${base}_bs_%02d.mp4"
-        mv "$workdir/$name" "$tmpdir"
+        mv "$workdir/$name" "$videodir"
     done
 
     for file in "$home/OneDrive/Pictures/Xbox Screenshots"/*.*; do
